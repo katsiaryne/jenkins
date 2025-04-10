@@ -1,0 +1,28 @@
+image: maven:latest
+
+stages:
+  - build
+  - test
+
+build-job:
+  stage: build
+  script:
+    - mvn clean package -DskipTests
+    - echo "Compile complete."
+
+unit-test-job:
+  stage: test
+  script:
+    - echo "Running unit tests..."
+    - mvn clean test
+    - mvn allure:report
+  artifacts:
+    when: always
+    paths:
+      - target/surefire-reports/TEST-*.xml
+      - target/allure-results/**
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+  after_script:
+    - echo "Allure results are in target/allure-results. Use 'allure serve' locally or check Jenkins Allure report."
